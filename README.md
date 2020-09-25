@@ -1,2 +1,1 @@
-# azure-pipelines
-Azure Pipelines for Caassis projects
+# Azure Pipelines for Caassis projects

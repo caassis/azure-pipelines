@@ -1,0 +1,40 @@
+parameters:
+- name: 'pool'
+  type: object
+  default:
+    vmImage: 'ubuntu-latest'
+- name: 'displayName'
+  type: string
+- name: 'registries'
+  type: object
+  default:
+  - Scaleway (fr-par)
+- name: 'repository'
+  type: string
+- name: 'dockerfile'
+  type: string
+  default: '**/Dockerfile'
+- name: 'tags'
+  type: string
+
+jobs:
+- job: BuildAndPushDockerImage
+  displayName: Build and push the ${{ parameters.displayName }} Docker image
+  pool: ${{ parameters.pool }}
+  steps:
+  - ${{ each registry in parameters.registries }}:
+    - task: Docker@2
+      displayName: Build the ${{ parameters.displayName }} Docker image for ${{ registry }} registry
+      inputs:
+        containerRegistry: ${{ registry }}
+        repository: ${{ parameters.repository }}
+        command: 'build'
+        Dockerfile: ${{ parameters.dockerfile }}
+        tags: ${{ parameters.tags }}
+    - task: Docker@2
+      displayName: Push the ${{ parameters.displayName }} Docker image to ${{ registry }} registry
+      inputs:
+        containerRegistry: ${{ registry }}
+        repository: ${{ parameters.repository }}
+        command: 'push'
+        tags: ${{ parameters.tags }}

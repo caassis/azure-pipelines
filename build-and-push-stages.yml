@@ -1,0 +1,33 @@
+parameters:
+- name: 'stages'
+  type: object
+# below parameters of './build-and-push-jobs.yml' template
+- name: 'pool'
+  type: object
+  default:
+    vmImage: 'ubuntu-latest'
+- name: 'displayName'
+  type: string
+- name: 'registries'
+  type: object
+  default:
+  - Scaleway (fr-par)
+- name: 'repository'
+  type: string
+- name: 'dockerfile'
+  type: string
+  default: '**/Dockerfile'
+
+stages:
+- ${{ each stage in parameters.stages }}:
+  - stage: ${{ stage.name }}
+    condition: ${{ stage.condition }}
+    jobs:
+    - template: ./build-and-push-jobs.yml
+      parameters:
+        pool: ${{ parameters.pool }}
+        displayName: ${{ parameters.dislayName }}
+        registries: ${{ parameters.registries }}
+        repository: ${{ parameters.repository }}
+        dockerfile: ${{ parameters.dockerfile }}
+        tags: ${{ stage.tags }}
